@@ -6,11 +6,10 @@ if (!defined('READFILE')) {
 
 class Authorization
 {
-
     protected $usersList;
 
     public function __construct($pathToUsersBase)
-    {
+    {	
         $this->usersList = $this->prepareUsersList($pathToUsersBase);
     }
 
@@ -22,11 +21,10 @@ class Authorization
         if (empty($pathToUsersBase)) {
             throw new Exception('Empty "pathToUsersBase" in config.php', 700);
         }
-
-        if (file_exists($pathToUsersBase) && is_readable($pathToUsersBase)) {
-            libxml_use_internal_errors(true);
-            $xmlObject = simplexml_load_file($pathToUsersBase);
-
+	
+	if (file_exists($pathToUsersBase) && is_readable($pathToUsersBase)) {
+		libxml_use_internal_errors(true);
+		$xmlObject = simplexml_load_file($pathToUsersBase);
             if (empty($xmlObject)) {
                 $errors[] = "Errors by parse '{$pathToUsersBase}':\n";
 
@@ -38,7 +36,7 @@ class Authorization
             }
         } else {
             throw new Exception("The File '{$pathToUsersBase}' does not exist or not readable", 700);
-        }
+	}
 
         foreach ($xmlObject->user as $user) {
             $login = reset($user->login);
@@ -50,7 +48,7 @@ class Authorization
         return $result;
     }
 
-    public function chechUser($login, $md5_password)
+    public function checkUser($login, $md5_password)
     {
         if (!array_key_exists($login, $this->usersList)) {
             throw new Exception("The login '{$login}' does not exist", 600);
@@ -61,4 +59,10 @@ class Authorization
         }
     }
 
+    public function checkVersion($valid_version, $version)
+    {
+    	if (substr($valid_version,0,5) > substr($version,0,5)) {
+            throw new Exception("Version not supported", 900);
+        }
+    }
 }
