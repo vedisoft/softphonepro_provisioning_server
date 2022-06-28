@@ -61,7 +61,7 @@ class Authorization
 
     public function checkVersion($valid_version, $version)
     {
-    	if (substr($valid_version,0,5) > substr($version,0,5)) {
+        if (version_compare($valid_version, $version, ">")) {
             throw new Exception("Version not supported", 900);
         }
     }
